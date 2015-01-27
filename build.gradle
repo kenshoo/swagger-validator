@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.7
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+idea {
+    project {
+        jdkName = '1.7'
+    }
+}
+
+def springVersion = '3.2.2.RELEASE'
+
+def libraries = [
+    snakeYaml: 'org.yaml:snakeyaml:1.9',
+    jsr311API: 'javax.ws.rs:jsr311-api:1.1.1',
+    junit: 'junit:junit:4.11',
+    guava: 'com.google.guava:guava:14.0.1',
+    springCore: "org.springframework:spring-core:$springVersion",
+
+]
+
+dependencies {
+    testCompile libraries.junit
+    compile libraries.snakeYaml
+    compile libraries.jsr311API
+    compile libraries.guava
+    compile libraries.springCore
+}
