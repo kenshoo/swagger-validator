@@ -2,6 +2,9 @@ package com.kenshoo.swagger.validator;
 
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  */
 public class SwaggerValidatorTest {
@@ -32,6 +35,17 @@ public class SwaggerValidatorTest {
         swaggerValidator.validateDefinitions();
     }
 
+    @Test()
+    public void testForbiddenTypeOverrideYaml() throws Exception {
+        SwaggerValidatorConf conf = new SwaggerValidatorConf() {
+            @Override
+            public Set<Class<?>> getForbiddenClasses() {
+                return Collections.emptySet();
+            }
+        };
+        SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/forbidden_type.yaml"), conf);
+        swaggerValidator.validateDefinitions();
+    }
     @Test(expected = ValidationException.class)
     public void testXJavaClassPresentDefinition() throws Exception {
         new SwaggerValidator(getClass().getResourceAsStream("/no_xjava_definition.yaml")).validateDefinitions();

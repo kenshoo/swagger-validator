@@ -38,7 +38,7 @@ definitions:
         type: string      
       date:
         type: string
-    x-javaClass: com.kenshoo.swagger.validator.ForbidenTypeModel
+    x-javaClass: com.kenshoo.swagger.validator.ForbiddenTypeModel
 
   errorModel:
     required:
@@ -49,4 +49,4 @@ definitions:
         type: string
       errorMessage:
         type: string
-    x-javaClass: com.kenshoo.platform.rest.ErrorInfo
+    x-javaClass: com.kenshoo.swagger.validator.ErrorInfo
