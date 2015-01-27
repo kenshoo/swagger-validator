@@ -17,12 +17,13 @@ The default validations include:
   -  Warning is printed if unrecommended type is used.
 
 ## Validator Elements
-The Swagger Validator expects some additional elements to be present in the swagger.yaml to perform the validations.
+The Swagger Validator expects additional elements to be present in the swagger.yaml to perform the validations.
 #### x-javaClass
 **x-javaClass** defines the fully qualified name of the desired class. This is used to validate that the relevant class really exists in the classpath and it's a starting point for addition validations.
 
 ## Running 
 The SwaggerValidator is a simple Java class. It must be run in the classpath containing all the resources and definitions. 
+
 #### Example
 ```
 SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/swagger.yaml"));
@@ -30,7 +31,8 @@ swaggerValidator.validateDefinitions();
 swaggerValidator.validateResources();
 ```
 See unit tests for more examples.
-## Customization
+
+#### Customization
 ```
 SwaggerValidatorConf conf = new SwaggerValidatorConf() {
     @Override
