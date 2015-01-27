@@ -1,0 +1,74 @@
+swagger: '2.0'
+info:
+  version: '2'
+  title: Test
+  description: Test.
+basePath: '/v2'
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: mytag
+    description: My Tag
+paths:
+  
+  /test:
+    get:
+      description: Test
+      tags:
+        - mytag
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Returns something
+          schema:
+            $ref: '#/definitions/sm'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/errorModel'
+    x-javaClass: com.kenshoo.swagger.validator.SimpleResource
+    
+
+definitions:
+
+  refModel:
+    properties:
+      d:
+        type: string
+      myarray:
+        type: array
+        items:
+          type: string
+    x-javaClass: com.kenshoo.swagger.validator.RefSimpleModel
+
+  sm:
+    properties:
+      a:
+        type: string      
+      b:
+        type: string      
+      c:
+        type: string
+      i:
+        type: integer
+      e:
+        $ref: "#/definitions/refModel"
+    x-javaClass: com.kenshoo.swagger.validator.SimpleModel
+
+
+
+  errorModel:
+    required:
+      - errorCode
+      - errorMessage
+    properties:
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
+    x-javaClass: com.kenshoo.swagger.validator.ErrorInfo
