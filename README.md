@@ -1,4 +1,7 @@
 # Swagger Validator
+
+[![Build Status](https://travis-ci.org/kenshoo/swagger-validator.svg)](https://travis-ci.org/kenshoo/swagger-validator)
+
 ## Overview
 Validates swagger.yaml file.
 Validation are done assuming JAX-RS resources and Jackson POJOs.
