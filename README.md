@@ -24,6 +24,18 @@ The Swagger Validator expects additional elements to be present in the swagger.y
 #### x-javaClass
 **x-javaClass** defines the fully qualified name of the desired class. This is used to validate that the relevant class really exists in the classpath and it's a starting point for addition validations.
 
+## Download
+The Swagger Validator is distributed using Maven Central.
+
+### Maven Dependency
+```
+<dependency>
+  <groupId>com.kenshoo</groupId>
+  <artifactId>swagger-validator</artifactId>
+  <version>${swagger-validator-version}</version>
+</dependency>
+```
+
 ## Running 
 The SwaggerValidator is a simple Java class. It must be run in the classpath containing all the resources and definitions. 
 
