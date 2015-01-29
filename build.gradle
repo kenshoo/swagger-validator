@@ -1,26 +1,29 @@
 apply plugin: 'java'
-apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = "com.kenshoo"
+archivesBaseName = "swagger-validator"
+version = '1.0'
 
 sourceCompatibility = 1.7
-version = '1.0'
 
 repositories {
     mavenCentral()
 }
 
-idea {
-    project {
-        jdkName = '1.7'
-    }
-}
 
 def springVersion = '3.2.2.RELEASE'
+def jsr311Version = '1.1.1'
+def snakeYamlVersion = '1.9'
+def junitVersion = '4.11'
+def guavaVersion = '14.0.1'
 
 def libraries = [
-    snakeYaml: 'org.yaml:snakeyaml:1.9',
-    jsr311API: 'javax.ws.rs:jsr311-api:1.1.1',
-    junit: 'junit:junit:4.11',
-    guava: 'com.google.guava:guava:14.0.1',
+    snakeYaml: "org.yaml:snakeyaml:$snakeYamlVersion",
+    jsr311API: "javax.ws.rs:jsr311-api:$jsr311Version",
+    junit: "junit:junit:$junitVersion",
+    guava: "com.google.guava:guava:$guavaVersion",
     springCore: "org.springframework:spring-core:$springVersion",
 
 ]
@@ -31,4 +34,76 @@ dependencies {
     compile libraries.jsr311API
     compile libraries.guava
     compile libraries.springCore
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+uploadArchives {
+    def username = project.hasProperty("ossrhUsername") ? $ossrhUsername : "dummy"
+    def password = project.hasProperty("ossrhPassword") ? $ossrhPassword : "dummy"
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: username, password: password)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: username, password: password)
+            }
+
+            pom.project {
+                packaging 'jar'
+                name "$project.group:$archivesBaseName"
+                description 'Swagger Validator provides an ability of validating the generated documentation against the actual written codebase.'
+                url 'https://github.com/kenshoo/swagger-validator'
+
+                scm {
+                    connection 'scm:git:git@github.com:kenshoo/swagger-validator.git'
+                    developerConnection 'scm:git:git@github.com:kenshoo/swagger-validator.git'
+                    url 'git@github.com:kenshoo/swagger-validator.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'tarlog'
+                        name 'Michael Elman'
+                        email 'michael.elman@kenshoo.com'
+                        url 'https://github.com/tarlog'
+                        organization = 'Kenshoo' // for some weird reason, organization requires equals in order to put organization to pom, otherwise org.apache.maven.model.Organization.toString() is used
+                        organizationUrl 'http://www.kenshoo.com/'
+                        roles {
+                            role 'Software Architect'
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
