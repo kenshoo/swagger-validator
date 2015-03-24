@@ -256,10 +256,7 @@ public class MimeValidator implements Validator {
      * @return boolean
      */
     private boolean isJaxRsMethod(Method m) {
-        return m.getAnnotation(GET.class) != null   ||
-                m.getAnnotation(POST.class) != null  ||
-                m.getAnnotation(PUT.class) != null   ||
-                m.getAnnotation(DELETE.class) != null;
+        return m.getAnnotation(HttpMethod.class) != null;
     }
 
     /**
