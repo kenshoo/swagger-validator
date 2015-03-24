@@ -3,10 +3,8 @@ package com.kenshoo.swagger.validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@Path("/test")
-public class SimpleResource {
+@Path("/class-mime")
+public class SimpleResourceNoMime {
 
     @GET
     public SimpleModel getSomething() {

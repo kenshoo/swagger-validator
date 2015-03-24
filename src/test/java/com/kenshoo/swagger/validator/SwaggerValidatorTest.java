@@ -9,7 +9,6 @@ import java.util.Set;
  */
 public class SwaggerValidatorTest {
 
-
     @Test
     public void testValidYaml() throws Exception {
         SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/valid.yaml"));
@@ -20,6 +19,24 @@ public class SwaggerValidatorTest {
     @Test(expected = ValidationException.class)
     public void testInvalidPathYaml() throws Exception {
         SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/invalid_path.yaml"));
+        swaggerValidator.validateResources();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testNoMimeTypeYaml() throws Exception {
+        SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/no_mime.yaml"));
+        swaggerValidator.validateResources();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testInvalidMethodMimeTypeYaml() throws Exception {
+        SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/invalid_method_mime.yaml"));
+        swaggerValidator.validateResources();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testInvalidRootMimeTypeYaml() throws Exception {
+        SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/invalid_class_mime.yaml"));
         swaggerValidator.validateResources();
     }
 
