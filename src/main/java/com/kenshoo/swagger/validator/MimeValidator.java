@@ -228,7 +228,7 @@ public class MimeValidator implements Validator {
         Consumes consumesMethodAnnotation, consumesClassAnnotation = cls.getAnnotation(Consumes.class);
 
         for (Method m : cls.getMethods()) {
-            if (isJaxRsMethod(m)) {
+            if (isRestMethod(m)) {
                 producesMethodAnnotation = m.getAnnotation(Produces.class);
                 if (producesClassAnnotation == null && producesMethodAnnotation == null) {
                     messageEventHandler.handleError(
@@ -255,8 +255,13 @@ public class MimeValidator implements Validator {
      *
      * @return boolean
      */
-    private boolean isJaxRsMethod(Method m) {
-        return m.getAnnotation(HttpMethod.class) != null;
+    private boolean isRestMethod(Method m) {
+        return m.getAnnotation(GET.class) != null ||
+                m.getAnnotation(POST.class) != null ||
+                m.getAnnotation(PUT.class) != null ||
+                m.getAnnotation(DELETE.class) != null ||
+                m.getAnnotation(HEAD.class) != null ||
+                m.getAnnotation(OPTIONS.class) != null;
     }
 
     /**
