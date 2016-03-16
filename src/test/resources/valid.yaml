@@ -24,6 +24,26 @@ paths:
         - application/json
       responses:
         '200':
+          description: Returns somethings
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/sm"
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/errorModel'
+    x-javaClass: com.kenshoo.swagger.validator.SimpleResource
+    
+  /test/{id}:
+    get:
+      description: Test
+      tags:
+        - mytag
+      produces:
+        - application/json
+      responses:
+        '200':
           description: Returns something
           schema:
             $ref: '#/definitions/sm'
@@ -32,7 +52,6 @@ paths:
           schema:
             $ref: '#/definitions/errorModel'
     x-javaClass: com.kenshoo.swagger.validator.SimpleResource
-    
 
 definitions:
 

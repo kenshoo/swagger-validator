@@ -12,29 +12,21 @@ produces:
   - application/json
 paths:
   
-  /test:
-    get:
+  /test/{id}:
+    post:
       description: Test
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Returns somethings
+      tags:
+        - mytag
+      parameters:
+        - in: body
+          name: body
+          description: Something to add
+          required: false
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/sm"
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/errorModel'
-    delete:
-      description: Test
-      produces:
-        - application/json
+             $ref: "#/definitions/sm"
       responses:
-        '200':
-          description: Returns something
+        '201':
+          description: Creates something
           schema:
             $ref: '#/definitions/sm'
         default:
