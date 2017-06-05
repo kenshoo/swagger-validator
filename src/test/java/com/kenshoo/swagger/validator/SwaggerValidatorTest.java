@@ -56,5 +56,9 @@ public class SwaggerValidatorTest {
         new SwaggerValidator(getClass().getResourceAsStream("/no_xjava_definition.yaml")).validateResources();
     }
 
+    @Test
+    public void failAssert() throws Exception {
+        assertEquals(1, 2);   
+    }
 
 }
