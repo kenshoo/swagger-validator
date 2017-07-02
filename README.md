@@ -1,6 +1,5 @@
 # Swagger Validator
-
-[![Build Status](https://travis-ci.org/kenshoo/swagger-validator.svg)](https://travis-ci.org/kenshoo/swagger-validator)
+[![Build Status](https://travis-ci.org/kenshoo/swagger-validator.svg?branch=master)](https://travis-ci.org/kenshoo/swagger-validator)
 
 ## Overview
 Validates swagger.yaml file.
