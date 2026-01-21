@@ -19,9 +19,11 @@ paths:
         - application/json
       responses:
         '200':
-          description: Returns something
+          description: Returns somethings
           schema:
-            $ref: '#/definitions/sm'
+            type: array
+            items:
+              $ref: "#/definitions/sm"
         default:
           description: unexpected error
           schema:

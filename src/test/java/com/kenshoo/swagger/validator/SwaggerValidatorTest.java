@@ -30,6 +30,12 @@ public class SwaggerValidatorTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testPathOperationMismatchYaml() throws Exception {
+        SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/path_operation_mismatch.yaml"));
+        swaggerValidator.validateResources();
+    }
+
+    @Test(expected = ValidationException.class)
     public void testForbiddenTypeYaml() throws Exception {
         SwaggerValidator swaggerValidator = new SwaggerValidator(getClass().getResourceAsStream("/forbidden_type.yaml"));
         swaggerValidator.validateDefinitions();

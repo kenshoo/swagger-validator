@@ -29,7 +29,7 @@ class ResourceValidator implements Validator {
             if (cls == null) {
                 handleError("{0} is not defined.", SwaggerValidator.JAVA_CLASS_TAG);
             }
-            validatePathAnnotation(cls, path);
+
             for (Map.Entry<String, Object> entry : resource.entrySet()) {
                 String key = entry.getKey();
                 if (key.startsWith("x-")) {
@@ -44,7 +44,7 @@ class ResourceValidator implements Validator {
                     handleWarning("Operation {0} should not be defined. It's provided by the container.", key);
                     continue;
                 }
-                if (!isOperationAnnotatedMethodExists(cls, key)) {
+                if (!isOperationAnnotatedMethodExists(cls, path, key)) {
                     handleError("Method annotated with {0} operation not found in class {1}", key, cls);
                 } else {
                     // operation exists, check that it has tags
@@ -59,44 +59,37 @@ class ResourceValidator implements Validator {
         }
     }
 
-    private void validatePathAnnotation(Class<?> cls, String path) {
-        Path pathAnnotation = cls.getAnnotation(Path.class);
-        if (pathAnnotation == null) {
-            handleError("Path annotation not found on {0}", cls);
-        }
-
-        if (path.contains(pathAnnotation.value())) {
-            String methodPath = path.replace(pathAnnotation.value(), "");
-            if (methodPath.length() > 0) {
-                for (Method m : cls.getMethods()) {
-                    pathAnnotation = m.getAnnotation(Path.class);
-                    if (pathAnnotation != null && pathAnnotation.value().equals(methodPath)) {
-                        return;
-                    }
-                }
-                handleError("No path annotation matches {0}", path);
-            }
-        } else {
-            handleError("Path {0} on annotation does not match {1}", pathAnnotation.value(), path);
-        }
-    }
-
     /**
      * returns true if at least one public method with the relevant annotation exists
      * @param cls
+     * @param path
      * @param operation
      * @return
      */
-    private boolean isOperationAnnotatedMethodExists(Class<?> cls, String operation) {
+    private boolean isOperationAnnotatedMethodExists(Class<?> cls, String path, String operation) {
+        Path pathAnnotation = cls.getAnnotation(Path.class);
+
+        if (pathAnnotation == null) {
+            handleError("Path annotation not found on {0}", cls);
+        } else if (!path.contains(pathAnnotation.value())) {
+            handleError("Path {0} on annotation does not match {1}", pathAnnotation.value(), path);
+        }
+
+        String methodPath = path.replace(pathAnnotation.value(), "");
+
         for (Method m : cls.getMethods()) {
-            Annotation[] annotations = m.getDeclaredAnnotations();
-            for (Annotation ann : annotations) {
-                HttpMethod httpMethod = ann.annotationType().getAnnotation(HttpMethod.class);
-                if (httpMethod != null && httpMethod.value().equalsIgnoreCase(operation)) {
-                    return true;
+            Path methodPathAnnotation = m.getAnnotation(Path.class);
+            if ((methodPath.length() == 0 && methodPathAnnotation == null) || (methodPathAnnotation != null && methodPath.equals(methodPathAnnotation.value()))) {
+                Annotation[] annotations = m.getDeclaredAnnotations();
+                for (Annotation ann : annotations) {
+                    HttpMethod httpMethod = ann.annotationType().getAnnotation(HttpMethod.class);
+                    if (httpMethod != null && httpMethod.value().equalsIgnoreCase(operation)) {
+                        return true;
+                    }
                 }
             }
         }
+
         return false;
     }
 
