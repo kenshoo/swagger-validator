@@ -1,6 +1,5 @@
 package com.kenshoo.swagger.validator;
 
-import com.google.common.collect.ImmutableSet;
 import org.springframework.util.ClassUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -73,10 +72,32 @@ public class SwaggerValidator {
      */
     public void validateResources() {
         Map<String, Object> paths = (Map<String, Object>) yaml.get("paths");
+        Map<String, Object> genericMetadata = getGenericMetadata("consumes", "produces");
         for (Map.Entry<String, Object> pathEntry : paths.entrySet()) {
             String path = pathEntry.getKey();
-            new ResourceValidator(path, (Map<String, Object>) pathEntry.getValue()).validate();
+            new ResourceValidator(path,
+                    (Map<String, Object>) pathEntry.getValue(),
+                    genericMetadata
+            ).validate();
         }
+    }
+
+    /**
+     * Retrieves items from yaml based on specified keys
+     *
+     * @param items
+     *
+     * @return Map<String, Object>
+     */
+    private Map<String, Object> getGenericMetadata(String... items) {
+        Map<String, Object> genericMetadata = new HashMap<>();
+        for (String item : items) {
+            Object data = yaml.get(item);
+            if (data != null) {
+                genericMetadata.put(item, data);
+            }
+        }
+        return genericMetadata;
     }
 
     void addDefinitionToValidate(String definition) {

@@ -2,24 +2,34 @@ package com.kenshoo.swagger.validator;
 
 import com.google.common.collect.ImmutableSet;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 class ResourceValidator implements Validator {
 
     private final String path;
     private final Map<String, Object> resource;
+    private final Map<String, Object> genericMetadata;
     public final static Set<String> forbiddenOperations = ImmutableSet.<String>of("options", "head");
+    private final MessageEventHandler messageEventHandler;
 
-    public ResourceValidator(String path, Map<String, Object> resource) {
+    /**
+     * @param path the resources path
+     * @param resource the resource metadata
+     * @param genericMetadata "Definitions" area metadata,
+     *                        when resources does not have more concrete configuration,
+     *                        default configuration defined in "Definitions" is used
+     *                        thus, we would like to have default configuration in the
+     *                        resource context.
+     */
+    public ResourceValidator(String path, Map<String, Object> resource, Map<String, Object> genericMetadata) {
         this.path = path;
         this.resource = resource;
+        this.genericMetadata = genericMetadata;
+        this.messageEventHandler = new MessageEventHandler(path);
     }
 
     @Override
@@ -27,9 +37,10 @@ class ResourceValidator implements Validator {
         try {
             Class<?> cls = SwaggerValidator.getClass(resource);
             if (cls == null) {
-                handleError("{0} is not defined.", SwaggerValidator.JAVA_CLASS_TAG);
+                messageEventHandler.handleError("{0} is not defined.", SwaggerValidator.JAVA_CLASS_TAG);
             }
             validatePathAnnotation(cls, path);
+            new MimeValidator(cls, path, resource, genericMetadata).validate();
             for (Map.Entry<String, Object> entry : resource.entrySet()) {
                 String key = entry.getKey();
                 if (key.startsWith("x-")) {
@@ -41,28 +52,28 @@ class ResourceValidator implements Validator {
                     continue;
                 }
                 if (forbiddenOperations.contains(key.toLowerCase())) {
-                    handleWarning("Operation {0} should not be defined. It's provided by the container.", key);
+                    messageEventHandler.handleWarning("Operation {0} should not be defined. It's provided by the container.", key);
                     continue;
                 }
                 if (!isOperationAnnotatedMethodExists(cls, key)) {
-                    handleError("Method annotated with {0} operation not found in class {1}", key, cls);
+                    messageEventHandler.handleError("Method annotated with {0} operation not found in class {1}", key, cls);
                 } else {
                     // operation exists, check that it has tags
                     Map<String, Object> operation = (Map<String, Object>) entry.getValue();
                     if (!operation.containsKey("tags")) {
-                        handleError("Tags must be defined for operation: {0}", key);
+                        messageEventHandler.handleError("Tags must be defined for operation: {0}", key);
                     }
                 }
             }
         } catch (ClassNotFoundException e) {
-            handleError("Class not found {0}", e.getMessage());
+            messageEventHandler.handleError("Class not found {0}", e.getMessage());
         }
     }
 
     private void validatePathAnnotation(Class<?> cls, String path) {
         Path pathAnnotation = cls.getAnnotation(Path.class);
         if (pathAnnotation == null) {
-            handleError("Path annotation not found on {0}", cls);
+            messageEventHandler.handleError("Path annotation not found on {0}", path, cls);
         }
 
         if (path.contains(pathAnnotation.value())) {
@@ -74,10 +85,10 @@ class ResourceValidator implements Validator {
                         return;
                     }
                 }
-                handleError("No path annotation matches {0}", path);
+                messageEventHandler.handleError("No path annotation matches {0}", path);
             }
         } else {
-            handleError("Path {0} on annotation does not match {1}", pathAnnotation.value(), path);
+            messageEventHandler.handleError("Path {0} on annotation does not match {1}", pathAnnotation.value(), path);
         }
     }
 
@@ -98,16 +109,5 @@ class ResourceValidator implements Validator {
             }
         }
         return false;
-    }
-
-    public void handleError(String msg, Object... arguments) {
-        String formatted = handleWarning(msg, arguments);
-        throw new ValidationException(formatted);
-    }
-
-    public String handleWarning(String msg, Object... arguments) {
-        String formatted = MessageFormat.format("Path: {0}: {1}", path, MessageFormat.format(msg, arguments));
-        System.out.println(formatted);
-        return formatted;
     }
 }
